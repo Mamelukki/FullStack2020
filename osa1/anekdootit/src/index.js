@@ -5,17 +5,32 @@ const randomArrayIndex = () => {
   return Math.floor(Math.random() * anecdotes.length)  
 }
 
+const Button = (props) => (
+  <button onClick={props.onClick}>
+    {props.text}
+  </button>
+)
+
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVote] = useState(new Uint8Array(anecdotes.length))
 
   const handleNextAnecdoteClick = () => { 
     setSelected(randomArrayIndex())
   }
 
+  const handleVoteClick = () => {
+    const copy = [...votes]
+    copy[selected] += 1
+    setVote(copy)
+  }
+
   return (
     <div>
       {props.anecdotes[selected]}
-      <button onClick={handleNextAnecdoteClick}>next anecdote </button>
+      <p>has {votes[selected]} votes </p>
+      <Button onClick={handleNextAnecdoteClick} text="next anecdote" />
+      <Button onClick={handleVoteClick} text="vote" />
     </div>
   )
 }
