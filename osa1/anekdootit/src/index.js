@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
-const randomArrayIndex = () => {
-  return Math.floor(Math.random() * anecdotes.length)  
-}
-
 const Button = (props) => (
   <button onClick={props.onClick}>
     {props.text}
@@ -14,23 +10,36 @@ const Button = (props) => (
 const App = (props) => {
   const [selected, setSelected] = useState(0)
   const [votes, setVote] = useState(new Uint8Array(anecdotes.length))
+  const [mostVoted, setMostVoted] = useState(0) 
 
   const handleNextAnecdoteClick = () => { 
     setSelected(randomArrayIndex())
+  }
+
+  const randomArrayIndex = () => {
+    return Math.floor(Math.random() * anecdotes.length)  
   }
 
   const handleVoteClick = () => {
     const copy = [...votes]
     copy[selected] += 1
     setVote(copy)
+    
+    if (copy[selected] > copy[mostVoted]) {
+      setMostVoted(selected)
+    }
   }
 
   return (
     <div>
+      <h1>Anecdote of the day </h1>
       {props.anecdotes[selected]}
       <p>has {votes[selected]} votes </p>
       <Button onClick={handleNextAnecdoteClick} text="next anecdote" />
       <Button onClick={handleVoteClick} text="vote" />
+      <h1>Anecdote with most votes</h1>
+      {props.anecdotes[mostVoted]}
+      <p>has {votes[mostVoted]} votes </p>
     </div>
   )
 }
