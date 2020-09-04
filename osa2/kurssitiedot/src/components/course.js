@@ -3,9 +3,14 @@ import React from 'react'
 const Course = (props) => {
   return (
     <div>
-      <Header course={props.course} />
-      <Content course={props.course} />
-      <Total course={props.course} />
+      <h1>Half Stack application development</h1>
+      {props.courses.map(course => 
+        <div key={course.id}>   
+          <Header course={course.name} /> 
+          <Content parts={course.parts} />
+          <Total parts={course.parts} />
+        </div>
+      )}
     </div>
   )
 }
@@ -13,7 +18,7 @@ const Course = (props) => {
 const Header = (props) => {
   return (
     <div>
-      <h1>{props.course.name}</h1>
+      <h2>{props.course}</h2>
     </div>
   )
 }
@@ -29,7 +34,7 @@ const Part = (props) => {
 const Content = (props) => {
   return (
     <div>
-      {props.course.parts.map(part => <Part key={part.id} part={part.name} exercises={part.exercises} />)}
+      {props.parts.map(part => <Part key={part.id} part={part.name} exercises={part.exercises} />)}
     </div>
   )
 }
@@ -37,7 +42,7 @@ const Content = (props) => {
 const Total = (props) => {
   return (
     <div>
-      <b>total of {props.course.parts.reduce((sum, part) => sum + part.exercises, 0)} </b>
+      <b>total of {props.parts.reduce((sum, part) => sum + part.exercises, 0)} exercises </b>
     </div>
   )
 } 
