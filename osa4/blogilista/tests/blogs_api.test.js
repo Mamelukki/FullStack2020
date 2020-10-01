@@ -82,9 +82,9 @@ test('added blog with undefined likes will get 0 likes ', async () => {
   expect(addedBlog.likes).toBe(0)
 })
 
-test('blog with no name or author will result in 400 bad request', async () => {
+test('blog with no name or url will result in 400 bad request', async () => {
   const newBlog = {
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
+    author: 'Edsger W. Dijkstra'
   }
 
   await api
