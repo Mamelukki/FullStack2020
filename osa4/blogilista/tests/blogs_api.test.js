@@ -96,7 +96,25 @@ test('blog can be deleted', async () => {
   expect(titles).not.toContain(
     'TDD harms architecture'
   )
+})
 
+test('blog can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToEdit = blogsAtStart[0]
+
+  const editedBlog = {
+    ...blogToEdit, likes: 12
+  }
+
+  await api
+    .put(`/api/blogs/${blogToEdit.id}`)
+    .send(editedBlog)
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  const likes = blogsAtEnd[0].likes
+
+  expect(likes).toEqual(12)
 })
 
 afterAll(() => {
