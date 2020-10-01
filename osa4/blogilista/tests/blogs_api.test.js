@@ -1,28 +1,15 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const initialBlogs = [
-  {
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10
-  },
-  {
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 0
-  },
-]
+
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
+  let blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
 })
 
 test('blogs are returned as json', async () => {
@@ -52,12 +39,12 @@ test('a blog can be added', async () => {
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+  const blogsAtEnd = await helper.blogsInDb()
+  expect (blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
-  const title = response.body.map(r => r.title)
+  const titles = blogsAtEnd.map(b => b.title)
 
-  expect(response.body).toHaveLength(initialBlogs.length + 1)
-  expect(title).toContain(
+  expect(titles).toContain(
     'Go To Statement Considered Harmful'
   )
 })
@@ -91,6 +78,25 @@ test('blog with no name or url will result in 400 bad request', async () => {
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
+})
+
+test('blog can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[1]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd.length).toBe(helper.initialBlogs.length - 1)
+
+  const titles = blogsAtEnd.map(b => b.title)
+
+  expect(titles).not.toContain(
+    'TDD harms architecture'
+  )
+
 })
 
 afterAll(() => {
