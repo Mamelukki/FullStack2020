@@ -30,12 +30,7 @@ describe('when there is initially some blogs saved', () => {
 
 describe('addition of a blog', () => {
   test('new blog gets added to the database successfully', async () => {
-    const newBlog = {
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5
-    }
+    const newBlog = helper.newBlog
 
     await api
       .post('/api/blogs')
@@ -48,17 +43,11 @@ describe('addition of a blog', () => {
 
     const titles = blogsAtEnd.map(b => b.title)
 
-    expect(titles).toContain(
-      'Go To Statement Considered Harmful'
-    )
+    expect(titles).toContain(newBlog.title)
   })
 
   test('blog with undefined likes will get 0 likes when it is created', async () => {
-    const newBlog = {
-      title: 'Canonical string reduction',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html'
-    }
+    const newBlog = helper.newBlogWithNoLikes
 
     await api
       .post('/api/blogs')
@@ -68,15 +57,13 @@ describe('addition of a blog', () => {
 
     const response = await api.get('/api/blogs')
 
-    const addedBlog = response.body.find(blog => blog.title === 'Canonical string reduction')
+    const addedBlog = response.body.find(blog => blog.title === newBlog.title)
 
     expect(addedBlog.likes).toBe(0)
   })
 
   test('blog with no name or url will result in 400 bad request', async () => {
-    const newBlog = {
-      author: 'Edsger W. Dijkstra'
-    }
+    const newBlog = helper.newBlogWithNoTitleOrUrl
 
     await api
       .post('/api/blogs')
