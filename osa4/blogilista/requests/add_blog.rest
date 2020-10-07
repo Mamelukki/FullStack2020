@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RhYWphIiwiaWQiOiI1ZjdkZjA4ZmEwMzA1MzYyZWJiYmU3YzgiLCJpYXQiOjE2MDIwOTA2ODd9.VfHuC6MZTDbELjfwFyIKzJ61oZGfIyeJ4TtrtP7mp40
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RhYWphIiwiaWQiOiI1ZjdkZjA4ZmEwMzA1MzYyZWJiYmU3YzgiLCJpYXQiOjE2MDIwOTE1MzB9.LiWndm5P5hWJ0AeRsAWamV950mUS6TLEhMql0IV7Al4
 
 {
     "title": "Testiblogi",
