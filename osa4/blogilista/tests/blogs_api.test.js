@@ -31,11 +31,34 @@ describe('when there is initially some blogs saved', () => {
 })
 
 describe('addition of a blog', () => {
-  test('new blog gets added to the database successfully', async () => {
+  let token = null
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('salainen', 10)
+    const user = new User({ username: 'mluukkai', passwordHash })
+
+    await user.save()
+
+    const loginUser = {
+      username: 'mluukkai',
+      password: 'salainen'
+    }
+
+    const response = await api
+      .post('/api/login')
+      .send(loginUser)
+
+    token = response.body.token
+  })
+
+  test('new blog gets added to the database successfully if a valid token is given', async () => {
     const newBlog = helper.newBlog
 
     await api
       .post('/api/blogs')
+      .set('Authorization', 'bearer ' + token)
       .send(newBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -48,11 +71,38 @@ describe('addition of a blog', () => {
     expect(titles).toContain(newBlog.title)
   })
 
+  test('new blog will not get added to the database if the token is invalid or missing', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+
+    const newBlog = {
+      title: 'Ei Tietokantaan lisättävä',
+      author: 'Testikirjoittaja',
+      url: 'testiosoite.fi',
+      likes: 0
+    }
+
+    const token = ''
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', 'bearer' + token)
+      .send(newBlog)
+      .expect(401)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect (blogsAtEnd.length).toBe(blogsAtStart.length)
+
+    const titles = blogsAtEnd.map(b => b.title)
+
+    expect(titles).not.toContain(newBlog.title)
+  })
+
   test('blog with undefined likes will get 0 likes when it is created', async () => {
     const newBlog = helper.newBlogWithNoLikes
 
     await api
       .post('/api/blogs')
+      .set('Authorization', 'bearer ' + token)
       .send(newBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -69,22 +119,60 @@ describe('addition of a blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', 'bearer ' + token)
       .send(newBlog)
       .expect(400)
   })
 })
 
 describe('deletion of a blog', () => {
-  test('removes the blog from the dabase if the id is valid', async () => {
+  let token = null
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('salainen', 10)
+    const user = new User({ username: 'mluukkai', passwordHash })
+
+    await user.save()
+
+    const loginUser = {
+      username: 'mluukkai',
+      password: 'salainen'
+    }
+
+    const response = await api
+      .post('/api/login')
+      .send(loginUser)
+
+    token = response.body.token
+  })
+
+  test('removes the blog from the database if the id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[1]
+
+    const newBlog = {
+      title: 'testiblogi',
+      author: 'bloggaaja',
+      url: 'www.testiblogi.fi',
+      likes: 0
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', 'bearer ' + token)
+      .send(newBlog)
+
+    const blogsAfterAddingNewBlog = await helper.blogsInDb()
+    const blogToDelete = blogsAfterAddingNewBlog[blogsAfterAddingNewBlog.length - 1]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', 'bearer ' + token)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1)
+    expect(blogsAtEnd.length).toBe(blogsAtStart.length)
 
     const titles = blogsAtEnd.map(b => b.title)
 
@@ -93,6 +181,28 @@ describe('deletion of a blog', () => {
 })
 
 describe('updating a blog', () => {
+  let token = null
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('salainen', 10)
+    const user = new User({ username: 'mluukkai', passwordHash })
+
+    await user.save()
+
+    const loginUser = {
+      username: 'mluukkai',
+      password: 'salainen'
+    }
+
+    const response = await api
+      .post('/api/login')
+      .send(loginUser)
+
+    token = response.body.token
+  })
+
   test('changes the info of an existing blog correctly', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToEdit = blogsAtStart[0]
@@ -103,6 +213,7 @@ describe('updating a blog', () => {
 
     await api
       .put(`/api/blogs/${blogToEdit.id}`)
+      .set('Authorization', 'bearer ' + token)
       .send(editedBlog)
       .expect(200)
 
