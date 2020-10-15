@@ -74,9 +74,6 @@ const App = () => {
       likes: blog.likes + 1
     }
 
-    console.log(blog)
-    console.log(editedBlog)
-
     blogService
       .update(id, editedBlog)
       .then(returnedBlog => {
@@ -135,7 +132,7 @@ const App = () => {
         <h2>Blogs</h2>
         <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
         {blogForm()}
-        {blogs.map(blog =>
+        {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
           <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} />
         )}
       </div>
