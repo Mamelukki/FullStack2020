@@ -112,10 +112,10 @@ const App = () => {
       <div>
         <h2>Blogs</h2>
         <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
+        {blogForm()}
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
-        {blogForm()}
       </div>
     }
     </div>
