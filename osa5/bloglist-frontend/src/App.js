@@ -53,42 +53,56 @@ const App = () => {
     </div>
   )
 
-  const addBlog = (blogObject) => {
-    blogFormRef.current.toggleVisibility()
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-        setNotification(`A new blog ${blogObject.title} by ${blogObject.author} added`, 'success')
-      })
-      .catch(error => {
-        setNotification(`An error occurred while adding a blog. The cause: ${error.message}`, 'error')
-      })
+  const addBlog = async (blog) => {
+    try {
+      blogService.setToken(user.token)
+      const newBlog = await blogService.create(blog)
+      blogFormRef.current.toggleVisibility()
+      setBlogs(blogs.concat(newBlog))
+      setNotification(`A new blog ${blog.title} by ${blog.author} added`, 'success')  
+    } catch(error) {
+      setNotification(`An error occurred while adding a blog. The cause: ${error.message}`, 'error')
+    }
   }
 
-  const addLike = (id) => {
-    const blog = blogs.find(n => n.id === id)
+  const addLike = async (id) => {
+    const blogToUpdate = blogs.find(n => n.id === id)
 
     const editedBlog = {
-      ...blog, 
-      likes: blog.likes + 1
+      ...blogToUpdate, 
+      likes: blogToUpdate.likes + 1,
+      user: blogToUpdate.user.id
     }
 
-    blogService
-      .update(id, editedBlog)
-      .then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
-        setNotification(`1 like added to the blog ${blog.title} by ${blog.author}`, 'success')
-      })
-      .catch(error => {
-        setNotification(`An error occurred while giving a like. The cause: ${error.message}`, 'error')
-      })
+    try {
+      await blogService.update(editedBlog)
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : { ...blogToUpdate, likes: blogToUpdate.likes + 1 }))
+      setNotification(`1 like added to the blog ${blogToUpdate.title} by ${blogToUpdate.author}`, 'success')
+    } catch(error) {
+      setNotification(`An error occurred while giving a like. The cause: ${error.message}`, 'error')
+    }
+  }
+
+  const removeBlog = async (id) => {
+    const blogToRemove = blogs.find(n => n.id === id)
+    const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`) 
+    if (confirm) {
+      try {
+        blogService.setToken(user.token)
+        await blogService.remove(id)
+        setBlogs(blogs.filter(b => b.id !== id))
+        setNotification(`Removed blog ${blogToRemove.title} by ${blogToRemove.author}`, 'success')
+      } catch(error) {
+        setNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 'error')
+        console.log(error)
+      }
+    }
   }
 
   const blogForm = () => {
     return(
       <Togglable buttonLabel='new blog' ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} addLike={addLike}/>
+        <BlogForm createBlog={addBlog} />
       </Togglable>
     )
   }
@@ -104,11 +118,10 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       ) 
-      setNotification('Login successful', 'success')
-      blogService.setToken(user.token)
-      setUser(user)
       setUsername('')
       setPassword('')
+      setUser(user)
+      setNotification('Login successful', 'success')
     } catch (exception) {
       setNotification('Wrong username or password', 'error')
       setUsername('')
@@ -133,7 +146,7 @@ const App = () => {
         <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
         {blogForm()}
         {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} />
+          <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} removeBlog={() => removeBlog(blog.id)} />
         )}
       </div>
     }
