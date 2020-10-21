@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 const Blog = ({ blog, addLike, removeBlog }) => {
-const [showDetails, setShowDetails] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   const blogStyle = {
     paddingTop: 10,
@@ -21,21 +21,11 @@ const [showDetails, setShowDetails] = useState(false)
 
   return(
     <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author} <button onClick={() => setShowDetails(false)}>hide</button>
-      </div>
-      <div>
-        {blog.url}
-      </div>
-      <div>
-        likes {blog.likes} <button onClick={() => addLike(blog.id)}>like</button>
-      </div>
-      <div>
-        {blog.user.name}
-      </div>
-      <div>
-        <button onClick={() => removeBlog(blog.id)}>remove</button>
-      </div>
+      <div>{blog.title} {blog.author} <button onClick={() => setShowDetails(false)}>hide</button></div>
+      <div>{blog.url}</div>
+      <div>likes {blog.likes} <button onClick={() => addLike(blog.id)}>like</button></div>
+      <div>{blog.user.name}</div>
+      <div><button onClick={() => removeBlog(blog.id)}>remove</button></div>
     </div>
   )
 }

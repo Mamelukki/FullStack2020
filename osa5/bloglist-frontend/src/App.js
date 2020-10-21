@@ -20,7 +20,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -94,7 +94,6 @@ const App = () => {
         setNotification(`Removed blog ${blogToRemove.title} by ${blogToRemove.author}`, 'success')
       } catch(error) {
         setNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 'error')
-        console.log(error)
       }
     }
   }

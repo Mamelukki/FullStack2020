@@ -13,7 +13,6 @@ const getAll = () => {
 }
 
 const create = async (newObject) => {
-  console.log(token)
   const config = {
     headers: { Authorization: token },
   }
@@ -28,7 +27,6 @@ const update = (blog) => {
 }
 
 const remove = (id) => {
-  console.log(token)
   const config = {
     headers: { Authorization: token },
   }
