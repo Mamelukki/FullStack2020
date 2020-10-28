@@ -79,3 +79,31 @@ test('clicking the like button twice creates two event handler calls', async () 
 
   expect(mockHandler.mock.calls).toHaveLength(2)
 })
+
+test('clicking the like button twice creates two event handler calls', async () => {
+  const blog = {
+    title: 'Kolmas blogi',
+    author: 'Bloggaaja',
+    url: 'testiblogi3.fi',
+    likes: 3,
+    user: {
+      username: 'Matti',
+      name: 'Luukkainen'
+    }
+  }
+
+  const mockHandler = jest.fn()
+
+  const component = render(
+    <Blog blog={blog} addLike={mockHandler} />
+  )
+
+  const viewButton = component.getByText('view')
+  fireEvent.click(viewButton)
+
+  const likeButton = component.getByText('like')
+  fireEvent.click(likeButton)
+  fireEvent.click(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
+})
