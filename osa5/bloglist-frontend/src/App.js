@@ -5,11 +5,11 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
-import loginService from './services/login' 
+import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
@@ -59,7 +59,7 @@ const App = () => {
       const newBlog = await blogService.create(blog)
       blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(newBlog))
-      setNotification(`A new blog ${blog.title} by ${blog.author} added`, 'success')  
+      setNotification(`A new blog ${blog.title} by ${blog.author} added`, 'success')
     } catch(error) {
       setNotification(`An error occurred while adding a blog. The cause: ${error.message}`, 'error')
     }
@@ -69,7 +69,7 @@ const App = () => {
     const blogToUpdate = blogs.find(n => n.id === id)
 
     const editedBlog = {
-      ...blogToUpdate, 
+      ...blogToUpdate,
       likes: blogToUpdate.likes + 1,
       user: blogToUpdate.user.id
     }
@@ -85,7 +85,7 @@ const App = () => {
 
   const removeBlog = async (id) => {
     const blogToRemove = blogs.find(n => n.id === id)
-    const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`) 
+    const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)
     if (confirm) {
       try {
         blogService.setToken(user.token)
@@ -116,7 +116,7 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       setUsername('')
       setPassword('')
       setUser(user)
@@ -137,18 +137,18 @@ const App = () => {
     <div>
       <Notification message={message} type={messageType} />
       {user === null ?
-      <div>
-      {loginForm()} 
-      </div> :
-      <div>
-        <h2>Blogs</h2>
-        <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
-        {blogForm()}
-        {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} removeBlog={() => removeBlog(blog.id)} />
-        )}
-      </div>
-    }
+        <div>
+          {loginForm()}
+        </div> :
+        <div>
+          <h2>Blogs</h2>
+          <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
+          {blogForm()}
+          {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+            <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} removeBlog={() => removeBlog(blog.id)} />
+          )}
+        </div>
+      }
     </div>
   )
 }
