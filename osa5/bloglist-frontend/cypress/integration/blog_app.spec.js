@@ -38,4 +38,22 @@ describe('Blog app', function() {
       cy.get('.error').should('have.css', 'border-style', 'solid')
     })
   })
+
+  describe.only('When logged in', function() {
+    beforeEach(function() {
+      cy.get('#username').type('mluukkai')
+      cy.get('#password').type('salainen')
+      cy.get('#login-button').click()
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('new blog').click()
+      cy.get('#title').type('testiblogi')
+      cy.get('#author').type('testikirjoittaja')
+      cy.get('#url').type('testiurl')
+      cy.get('#create-button').click()
+      cy.contains('A new blog testiblogi by testikirjoittaja added')
+    })
+  })
+
 })
