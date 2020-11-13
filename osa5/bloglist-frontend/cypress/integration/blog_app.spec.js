@@ -53,6 +53,7 @@ describe('Blog app', function() {
       cy.get('#url').type('testiurl')
       cy.get('#create-button').click()
       cy.contains('A new blog testiblogi by testikirjoittaja added')
+      cy.contains('testiblogi testikirjoittaja')
     })
   })
 
