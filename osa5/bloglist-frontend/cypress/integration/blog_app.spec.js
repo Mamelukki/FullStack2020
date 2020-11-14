@@ -41,9 +41,12 @@ describe('Blog app', function() {
 
   describe.only('When logged in', function() {
     beforeEach(function() {
-      cy.get('#username').type('mluukkai')
-      cy.get('#password').type('salainen')
-      cy.get('#login-button').click()
+      cy.login({ username: 'mluukkai', password: 'salainen' })
+    })
+
+    beforeEach(function() {
+      cy.createBlog({ title: 'testiotsikko1', author: 'testikirjoittaja1', url: 'testiosoite1', likes: 0 })
+      cy.createBlog({ title: 'testiotsikko2', author: 'testikirjoittaja2', url: 'testiosoite2', likes: 2 })
     })
 
     it('A blog can be created', function() {
@@ -57,14 +60,15 @@ describe('Blog app', function() {
     })
 
     it('A like can be given to a blog', function() {
-      cy.contains('new blog').click()
-      cy.get('#title').type('testiblogi')
-      cy.get('#author').type('testikirjoittaja')
-      cy.get('#url').type('testiurl')
-      cy.get('#create-button').click()
-      cy.contains('view').click()
-      cy.get('#like-button').click()
-      cy.contains('likes 1')
+      cy.contains('testiotsikko1').contains('view').click()
+      cy.contains('testiotsikko1').get('#like-button').click()
+      cy.contains('testiotsikko1').parent().should('contain', 'likes 1')
+    })
+
+    it('A user who created the blog can remove it', function() {
+      cy.contains('testiotsikko1').contains('view').click()
+      cy.contains('testiotsikko1').get('#remove-button').click()
+      cy.get('testiotsikko1').should('not.exist')
     })
   })
 })
