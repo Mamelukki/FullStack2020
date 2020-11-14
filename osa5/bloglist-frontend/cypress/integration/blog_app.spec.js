@@ -55,6 +55,16 @@ describe('Blog app', function() {
       cy.contains('A new blog testiblogi by testikirjoittaja added')
       cy.contains('testiblogi testikirjoittaja')
     })
-  })
 
+    it('A like can be given to a blog', function() {
+      cy.contains('new blog').click()
+      cy.get('#title').type('testiblogi')
+      cy.get('#author').type('testikirjoittaja')
+      cy.get('#url').type('testiurl')
+      cy.get('#create-button').click()
+      cy.contains('view').click()
+      cy.get('#like-button').click()
+      cy.contains('likes 1')
+    })
+  })
 })
