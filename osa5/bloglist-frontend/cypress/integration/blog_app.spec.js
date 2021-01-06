@@ -45,8 +45,9 @@ describe('Blog app', function() {
     })
 
     beforeEach(function() {
-      cy.createBlog({ title: 'testiotsikko1', author: 'testikirjoittaja1', url: 'testiosoite1', likes: 0 })
-      cy.createBlog({ title: 'testiotsikko2', author: 'testikirjoittaja2', url: 'testiosoite2', likes: 2 })
+      cy.createBlog({ title: 'testiotsikko1', author: 'testikirjoittaja1', url: 'testiosoite1' })
+      cy.createBlog({ title: 'testiotsikko2', author: 'testikirjoittaja2', url: 'testiosoite2' })
+      cy.createBlog({ title: 'testiotsikko3', author: 'testikirjoittaja3', url: 'testiosoite3' })
     })
 
     it('A blog can be created', function() {
@@ -69,6 +70,29 @@ describe('Blog app', function() {
       cy.contains('testiotsikko1').contains('view').click()
       cy.contains('testiotsikko1').get('#remove-button').click()
       cy.get('testiotsikko1').should('not.exist')
+    })
+
+    it('Blogs are organized in descending order based on the likes', function() {
+      cy.contains('testiotsikko1').as('blog1')
+      cy.contains('testiotsikko2').as('blog2')
+      cy.contains('testiotsikko3').as('blog3')
+
+      cy.get('@blog1').contains('view').click()
+      cy.get('@blog2').contains('view').click()
+      cy.get('@blog3').contains('view').click()
+
+      cy.get('@blog1').contains('like').click()
+      cy.get('@blog2').contains('like').click()
+      cy.get('@blog2').contains('like').click()
+      cy.get('@blog2').contains('like').click()
+      cy.get('@blog3').contains('like').click()
+      cy.get('@blog3').contains('like').click()
+      
+      cy.get('.blogWithDetails').then(blogs => {
+        cy.wrap(blogs[0]).contains('likes 3')
+        cy.wrap(blogs[1]).contains('likes 1')
+        cy.wrap(blogs[2]).contains('likes 1')
+      })
     })
   })
 })
