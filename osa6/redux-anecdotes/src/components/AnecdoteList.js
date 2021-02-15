@@ -16,9 +16,13 @@ const AnecdoteForm = () => {
     }, 5 * 1000)
   }
 
+  const filter = useSelector(state => state.filter)
+
+  const anecdotesToShow = filter === null ? anecdotes : anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
+
   return (
     <div>
-      {anecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
+      {anecdotesToShow.sort((a, b) => b.votes - a.votes).map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
