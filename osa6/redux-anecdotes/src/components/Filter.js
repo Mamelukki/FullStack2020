@@ -6,7 +6,6 @@ const Filter = () => {
   const dispatch = useDispatch()
 
   const handleChange = (event) => {
-    console.log(event.target.value)
     dispatch(setFilter(event.target.value))
     // input-kentän arvo muuttujassa event.target.value
   }
