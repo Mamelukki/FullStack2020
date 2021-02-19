@@ -21,9 +21,9 @@ const reducer = (state = [], action) => {
   }
 }
 
-export const createAnecdote = (data) => {
+export const createAnecdote = (content) => {
   return async dispatch => {
-    const newAnecdote = await anecdoteService.createNew(data)
+    const newAnecdote = await anecdoteService.createNew(content)
     dispatch({
       type: 'NEW_ANECDOTE',
       data: newAnecdote,
@@ -31,14 +31,20 @@ export const createAnecdote = (data) => {
   }
 }
 
-export const addVote  = (id) => {
-  return {
-    type: 'VOTE',
-    data: { id }
+export const addVote = (id) => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    const anecdoteToUpdate = anecdotes.find(anecdote => anecdote.id === id)
+    const votedAnecdote = ({ ...anecdoteToUpdate, votes: anecdoteToUpdate.votes + 1 })
+    const updatedAnecdote = await anecdoteService.update(votedAnecdote)
+    dispatch({
+      type: 'VOTE',
+      data: updatedAnecdote
+    })
   }
 }
 
-export const initializeAnecdotes = (anecdotes) => {
+export const initializeAnecdotes = () => {
   return async dispatch => {
     const anecdotes = await anecdoteService.getAll()
     dispatch({
