@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
   BrowserRouter as Router,
-  Switch, Route, Link, useParams
+  Switch, Route, Link, useParams, Redirect
 } from "react-router-dom"
 
 const Menu = ({ anecdotes }) => {
@@ -71,7 +71,7 @@ const CreateNew = (props) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
-
+  const [added, setAdded] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -81,6 +81,11 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    setAdded(true)
+  }
+
+  if (added) {
+    return <Redirect to="/" /> 
   }
 
   return (
@@ -103,7 +108,25 @@ const CreateNew = (props) => {
       </form>
     </div>
   )
+}
 
+const Notification = ({ notification }) => {
+  const style = {
+    border: 'solid',
+    borderColor: 'red',
+    padding: 10,
+    borderWidth: 2 
+  }
+  
+  if (!notification) {
+    return null
+  }
+  
+  return (
+    <div style={style}>
+      {notification}
+    </div>
+  )
 }
 
 const App = () => {
@@ -129,6 +152,11 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+    
+    setNotification(`Added new anecdote ${anecdote.content}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 10 * 1000)
   }
 
   const anecdoteById = (id) =>
@@ -150,6 +178,7 @@ const App = () => {
       <div>
         <h1>Software anecdotes</h1>
         <Menu anecdotes={anecdotes} />
+        <Notification notification={notification} />
         <div>
         <Switch>
           <Route path="/anecdotes/:id">        
@@ -159,7 +188,7 @@ const App = () => {
             <AnecdoteList anecdotes={anecdotes} />
           </Route>
           <Route path="/create">
-            <CreateNew addNew={addNew}/>
+            <CreateNew addNew={addNew} />
           </Route>
           <Route path="/about">
             <About />
