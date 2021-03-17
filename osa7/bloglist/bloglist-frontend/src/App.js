@@ -7,11 +7,12 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { addNotification } from './reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+import { newBlog, initializeBlogs } from './reducers/blogReducer'
+import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
   const dispatch = useDispatch()
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector(state => state.blogs)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -19,9 +20,7 @@ const App = () => {
   const blogFormRef = React.createRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
+    dispatch(initializeBlogs())
   }, [])
 
   useEffect(() => {
@@ -52,9 +51,8 @@ const App = () => {
   const addBlog = async (blog) => {
     try {
       blogService.setToken(user.token)
-      const newBlog = await blogService.create(blog)
+      dispatch(newBlog(blog))
       blogFormRef.current.toggleVisibility()
-      setBlogs(blogs.concat(newBlog))
       setNotification(`A new blog ${blog.title} by ${blog.author} added`, 5)
     } catch(error) {
       setNotification(`An error occurred while adding a blog. The cause: ${error.message}`, 5)
@@ -62,6 +60,7 @@ const App = () => {
   }
 
   const addLike = async (id) => {
+    /* Will be changed to use Redux
     const blogToUpdate = blogs.find(n => n.id === id)
 
     const editedBlog = {
@@ -69,7 +68,6 @@ const App = () => {
       likes: blogToUpdate.likes + 1,
       user: blogToUpdate.user.id
     }
-
     try {
       await blogService.update(editedBlog)
       setBlogs(blogs.map(blog => blog.id !== id ? blog : { ...blogToUpdate, likes: blogToUpdate.likes + 1 }))
@@ -77,11 +75,14 @@ const App = () => {
     } catch(error) {
       setNotification(`An error occurred while giving a like. The cause: ${error.message}`, 5)
     }
+    */
   }
 
   const removeBlog = async (id) => {
+    /* Will be changed to use Redux
     const blogToRemove = blogs.find(n => n.id === id)
     const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)
+    
     if (confirm) {
       try {
         blogService.setToken(user.token)
@@ -92,6 +93,7 @@ const App = () => {
         setNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 5)
       }
     }
+    */
   }
 
   const blogForm = () => {
