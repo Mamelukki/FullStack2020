@@ -7,7 +7,7 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { addNotification } from './reducers/notificationReducer'
-import { newBlog, initializeBlogs } from './reducers/blogReducer'
+import { newBlog, initializeBlogs, addLike, deleteBlog } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
@@ -59,41 +59,27 @@ const App = () => {
     }
   }
 
-  const addLike = async (id) => {
-    /* Will be changed to use Redux
-    const blogToUpdate = blogs.find(n => n.id === id)
-
-    const editedBlog = {
-      ...blogToUpdate,
-      likes: blogToUpdate.likes + 1,
-      user: blogToUpdate.user.id
-    }
+  const addLikeToBlog = async (blog) => {
     try {
-      await blogService.update(editedBlog)
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : { ...blogToUpdate, likes: blogToUpdate.likes + 1 }))
-      setNotification(`1 like added to the blog ${blogToUpdate.title} by ${blogToUpdate.author}`, 5)
+      dispatch(addLike(blog))
+      setNotification(`1 like added to the blog ${blog.title} by ${blog.author}`, 5)
     } catch(error) {
       setNotification(`An error occurred while giving a like. The cause: ${error.message}`, 5)
     }
-    */
   }
 
   const removeBlog = async (id) => {
-    /* Will be changed to use Redux
     const blogToRemove = blogs.find(n => n.id === id)
     const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)
     
     if (confirm) {
       try {
-        blogService.setToken(user.token)
-        await blogService.remove(id)
-        setBlogs(blogs.filter(b => b.id !== id))
+        dispatch(deleteBlog(id))
         setNotification(`Removed blog ${blogToRemove.title} by ${blogToRemove.author}`, 5)
       } catch(error) {
         setNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 5)
       }
     }
-    */
   }
 
   const blogForm = () => {
@@ -142,8 +128,8 @@ const App = () => {
           <h2>Blogs</h2>
           <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
           {blogForm()}
-          {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-            <Blog key={blog.id} blog={blog} addLike={() => addLike(blog.id)} removeBlog={() => removeBlog(blog.id)} />
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} addLike={() => addLikeToBlog(blog)} removeBlog={() => removeBlog(blog.id)} />
           )}
         </div>
       }
