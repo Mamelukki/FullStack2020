@@ -9,8 +9,14 @@ const blogReducer = (state = [], action) => {
     case 'INIT_BLOGS':
       return action.data.sort(byLikes)
     case 'ADD_LIKE':
+      const id = action.data.id
+      const blogToChange = state.find(b => b.id === id)
+      const changedBlog = { 
+        ...blogToChange, 
+        likes: blogToChange.likes + 1 
+      }
       return state.map(blog =>
-        blog.id !== action.data.id ? blog : action.data
+        blog.id !== id ? blog : changedBlog
       ).sort(byLikes)
     case 'REMOVE_BLOG':
       return state.filter(b => b.id !== action.data)
@@ -21,7 +27,7 @@ const blogReducer = (state = [], action) => {
 
 export const newBlog = (content) => {
   return async dispatch => {
-      const  newBlog = await blogService.create(content)
+      const newBlog = await blogService.create(content)
       dispatch({
           type: 'ADD_BLOG',
           data: newBlog
