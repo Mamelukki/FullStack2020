@@ -4,15 +4,18 @@ import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
-import { addNotification } from './reducers/notificationReducer'
-import { initializeUser, login, logout } from './reducers/userReducer'
+import UserTable from './components/UserTable'
+import { setUser, login, logout } from './reducers/loginReducer'
+import { initializeUsers } from './reducers/userReducer'
 import { newBlog, initializeBlogs, addLike, deleteBlog } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
-  const user = useSelector(state => state.user)
+  const notification = useSelector(state => state.notification)
+  const currentUser = useSelector(state => state.currentUser)
+  const users = useSelector(state => state.users)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -20,15 +23,15 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeBlogs())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
-    dispatch(initializeUser())
-  }, [])
+    dispatch(setUser())
+  }, [dispatch])
 
-  const setNotification = (message, time) => {
-    dispatch(addNotification(message, time))
-  }
+  useEffect(() => {
+    dispatch(initializeUsers())
+  }, [dispatch])
 
   const loginForm = () => (
     <div>
@@ -43,40 +46,25 @@ const App = () => {
   )
 
   const addBlog = async (blog) => {
-    try {
-      dispatch(newBlog(blog))
-      blogFormRef.current.toggleVisibility()
-      setNotification(`A new blog ${blog.title} by ${blog.author} added`, 5)
-    } catch(error) {
-      setNotification(`An error occurred while adding a blog. The cause: ${error.message}`, 5)
-    }
+    dispatch(newBlog(blog))
+    blogFormRef.current.toggleVisibility()
   }
 
   const addLikeToBlog = async (blog) => {
-    try {
-      dispatch(addLike(blog))
-      setNotification(`1 like added to the blog ${blog.title} by ${blog.author}`, 5)
-    } catch(error) {
-      setNotification(`An error occurred while giving a like. The cause: ${error.message}`, 5)
-    }
+    dispatch(addLike(blog))
   }
 
   const removeBlog = async (id) => {
     const blogToRemove = blogs.find(n => n.id === id)
     const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)
-    
+
     if (confirm) {
-      try {
-        dispatch(deleteBlog(id))
-        setNotification(`Removed blog ${blogToRemove.title} by ${blogToRemove.author}`, 5)
-      } catch(error) {
-        setNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 5)
-      }
+      dispatch(deleteBlog(id))
     }
   }
 
   const blogForm = () => {
-    return(
+    return (
       <Togglable buttonLabel='new blog' ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Togglable>
@@ -85,33 +73,33 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-
-    try {
-      dispatch(login(username, password))
-      setNotification('Login successful', 5)
-    } catch (exception) {
-      setNotification('Wrong username or password', 5)
-    }
+    dispatch(login(username, password))
+    setUsername('')
+    setPassword('')
   }
 
   const handleLogout = async (event) => {
     dispatch(logout())
+    setUsername('')
+    setPassword('')
   }
 
   return (
     <div>
-      <Notification />
-      {user === null ?
+      <Notification notification={notification} />
+      {currentUser === null ?
         <div>
           {loginForm()}
         </div> :
         <div>
           <h2>Blogs</h2>
-          <p>{user.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
+          <p>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
           {blogForm()}
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} addLike={() => addLikeToBlog(blog)} removeBlog={() => removeBlog(blog.id)} />
           )}
+          <h2>Users</h2>
+          <UserTable users={users} />
         </div>
       }
     </div>
