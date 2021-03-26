@@ -4,11 +4,16 @@ import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+import User from './components/User'
 import UserTable from './components/UserTable'
 import { setUser, login, logout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 import { newBlog, initializeBlogs, addLike, deleteBlog } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  BrowserRouter as Router,
+  Switch, Route
+} from 'react-router-dom'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -84,25 +89,44 @@ const App = () => {
     setPassword('')
   }
 
+  const loginView = () => {
+    return (
+      <div>
+        {currentUser === null ?
+          <div>
+            {loginForm()}
+          </div> :
+          <div>
+            <p>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
+          </div>
+        }
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <Notification notification={notification} />
-      {currentUser === null ?
-        <div>
-          {loginForm()}
-        </div> :
-        <div>
-          <h2>Blogs</h2>
-          <p>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
-          {blogForm()}
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} addLike={() => addLikeToBlog(blog)} removeBlog={() => removeBlog(blog.id)} />
-          )}
-          <h2>Users</h2>
-          <UserTable users={users} />
-        </div>
-      }
-    </div>
+    <Router>
+      <div>
+        <h2>Blogs</h2>
+        <Notification notification={notification} />
+        <Switch>
+          <Route path="/users/:id">
+            {loginView()}
+            <User users={users} />
+          </Route>
+          <Route path="/">
+            {loginView()}
+            <div>
+              {blogForm()}
+              {blogs.map(blog =>
+                <Blog key={blog.id} blog={blog} addLike={() => addLikeToBlog(blog)} removeBlog={() => removeBlog(blog.id)} />
+              )}
+            </div>
+            <UserTable users={users} />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   )
 }
 
