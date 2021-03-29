@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogList from './components/BlogList'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
@@ -8,7 +9,7 @@ import User from './components/User'
 import UserTable from './components/UserTable'
 import { setUser, login, logout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
-import { newBlog, initializeBlogs, addLike, deleteBlog } from './reducers/blogReducer'
+import { newBlog, initializeBlogs } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   BrowserRouter as Router,
@@ -53,19 +54,6 @@ const App = () => {
   const addBlog = async (blog) => {
     dispatch(newBlog(blog))
     blogFormRef.current.toggleVisibility()
-  }
-
-  const addLikeToBlog = async (blog) => {
-    dispatch(addLike(blog))
-  }
-
-  const removeBlog = async (id) => {
-    const blogToRemove = blogs.find(n => n.id === id)
-    const confirm = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)
-
-    if (confirm) {
-      dispatch(deleteBlog(id))
-    }
   }
 
   const blogForm = () => {
@@ -114,13 +102,15 @@ const App = () => {
             {loginView()}
             <User users={users} />
           </Route>
+          <Route path="/blogs/:id">
+            {loginView()}
+            <Blog blogs={blogs} />
+          </Route>
           <Route path="/">
             {loginView()}
             <div>
               {blogForm()}
-              {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} addLike={() => addLikeToBlog(blog)} removeBlog={() => removeBlog(blog.id)} />
-              )}
+              <BlogList blogs={blogs} />
             </div>
             <UserTable users={users} />
           </Route>
