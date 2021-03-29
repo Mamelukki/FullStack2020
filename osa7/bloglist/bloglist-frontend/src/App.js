@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogList from './components/BlogList'
 import Notification from './components/Notification'
@@ -7,13 +7,13 @@ import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import User from './components/User'
 import UserTable from './components/UserTable'
-import { setUser, login, logout } from './reducers/loginReducer'
+import { setUser, logout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 import { newBlog, initializeBlogs } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   BrowserRouter as Router,
-  Switch, Route
+  Switch, Route, Link
 } from 'react-router-dom'
 
 const App = () => {
@@ -22,8 +22,6 @@ const App = () => {
   const notification = useSelector(state => state.notification)
   const currentUser = useSelector(state => state.currentUser)
   const users = useSelector(state => state.users)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
 
   const blogFormRef = React.createRef()
 
@@ -41,13 +39,7 @@ const App = () => {
 
   const loginForm = () => (
     <div>
-      <LoginForm
-        username={username}
-        password={password}
-        handleUsernameChange={({ target }) => setUsername(target.value)}
-        handlePasswordChange={({ target }) => setPassword(target.value)}
-        handleSubmit={handleLogin}
-      />
+      <LoginForm />
     </div>
   )
 
@@ -64,55 +56,50 @@ const App = () => {
     )
   }
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    dispatch(login(username, password))
-    setUsername('')
-    setPassword('')
-  }
-
   const handleLogout = async (event) => {
     dispatch(logout())
-    setUsername('')
-    setPassword('')
   }
 
-  const loginView = () => {
-    return (
-      <div>
-        {currentUser === null ?
-          <div>
-            {loginForm()}
-          </div> :
-          <div>
-            <p>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></p>
-          </div>
-        }
-      </div>
-    )
+  const padding = {
+    padding: 5
+  }
+
+  const backgroundColor = {
+    backgroundColor: 'lightGrey',
+    padding: '8px'
   }
 
   return (
     <Router>
       <div>
-        <h2>Blogs</h2>
+        <h2>Blog app</h2>
+        <div style={backgroundColor}>
+          <Link style={padding} to="/blogs">notes</Link>
+          <Link style={padding} to="/users">users</Link>
+          {currentUser ? <em>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></em> : <Link style={padding} to="/login">login</Link>}
+        </div>
         <Notification notification={notification} />
         <Switch>
           <Route path="/users/:id">
-            {loginView()}
             <User users={users} />
           </Route>
           <Route path="/blogs/:id">
-            {loginView()}
             <Blog blogs={blogs} />
           </Route>
-          <Route path="/">
-            {loginView()}
-            <div>
-              {blogForm()}
-              <BlogList blogs={blogs} />
-            </div>
+          <Route path="/blogs">
+            <h2>Blogs</h2>
+            {blogForm()}
+            <BlogList blogs={blogs} />
+          </Route>
+          <Route path="/users">
             <UserTable users={users} />
+          </Route>
+          <Route path="/login">
+            {loginForm()}
+          </Route>
+          <Route path="/">
+            <h2>Blogs</h2>
+            <BlogList blogs={blogs} />
           </Route>
         </Switch>
       </div>
