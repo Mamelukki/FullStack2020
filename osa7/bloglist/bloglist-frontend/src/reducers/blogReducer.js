@@ -20,6 +20,15 @@ const blogReducer = (state = [], action) => {
       return state.map(blog =>
         blog.id !== id ? blog : changedBlog
       ).sort(byLikes)
+    case 'ADD_COMMENT':
+      const blogToComment = state.find(b => b.id === action.id)
+      const commentedBlog = {
+        ...blogToComment,
+        comments: blogToComment.comments.concat(action.data)
+      }
+      return state.map(blog =>
+        blog.id !== action.id ? blog : commentedBlog
+      )
     case 'REMOVE_BLOG':
       return state.filter(b => b.id !== action.data)
     default:
@@ -69,6 +78,22 @@ export const addLike = (blog) => {
   }
 }
 
+export const addComment = (blog, comment) => {
+    return async dispatch => {
+      try {
+        const newComment = await blogService.addComment(blog, comment)
+        dispatch({
+          type: 'ADD_COMMENT',
+          data: newComment,
+          id: blog.id
+        })
+        dispatch(addNotification(`New comment ${comment} added`, 'success', 5))
+      } catch (error) {
+        dispatch(addNotification(`An error occurred while adding a comment. The cause: ${error.message}`, 'error', 5))
+      }
+    }
+  }
+
 export const deleteBlog = (id) => {
   return async dispatch => {
     try {
@@ -81,8 +106,10 @@ export const deleteBlog = (id) => {
       })
       dispatch(addNotification(`Removed blog ${blogToRemove.title} by ${blogToRemove.author}`, 'success', 5))
       dispatch(initializeUsers())
+      return 'removeSucceeded'
     } catch (error) {
       dispatch(addNotification(`An error occurred while removing a blog. The cause: ${error.message}`, 'error', 5))
+      return 'removeFailed'
     }
   }
 }

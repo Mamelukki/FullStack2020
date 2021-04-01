@@ -13,7 +13,7 @@ router.get('/', async (request, response) => {
 router.post('/', async (request, response) => {
   const { password, name, username } = request.body
 
-  if ( !password || password.length<3 ) {
+  if ( !password || password.length < 3 ) {
     return response.status(400).send({
       error: 'password must min length 3'
     })

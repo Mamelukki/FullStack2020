@@ -5,7 +5,6 @@ import {
   useHistory
 } from 'react-router-dom'
 
-
 const LoginForm = () => {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -14,10 +13,13 @@ const LoginForm = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    dispatch(login(username, password))
     setUsername('')
     setPassword('')
-    history.push('/')
+    dispatch(login(username, password)).then(result => {
+      if (result === 'succeededLogin') {
+        history.push('/blogs')
+      }
+    })
   }
 
   return (

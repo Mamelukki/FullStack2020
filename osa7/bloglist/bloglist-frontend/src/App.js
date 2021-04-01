@@ -74,7 +74,7 @@ const App = () => {
       <div>
         <h2>Blog app</h2>
         <div style={backgroundColor}>
-          <Link style={padding} to="/blogs">notes</Link>
+          <Link style={padding} to="/blogs">blogs</Link>
           <Link style={padding} to="/users">users</Link>
           {currentUser ? <em>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></em> : <Link style={padding} to="/login">login</Link>}
         </div>

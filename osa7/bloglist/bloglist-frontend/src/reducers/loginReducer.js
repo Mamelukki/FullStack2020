@@ -27,8 +27,10 @@ export const login = (username, password) => {
         data: user
       })
       dispatch(addNotification('Login successful', 'success', 5))
+      return 'succeededLogin'
     } catch (error) {
       dispatch(addNotification('Wrong username or password', 'error', 5))
+      return 'failedLogin'
     }
   }
 }
