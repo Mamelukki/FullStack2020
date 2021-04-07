@@ -1,4 +1,4 @@
-# FullStack 2020 - 2021
+# Full Stack 2020 - 2021
 
 Full Stack -kurssin tehtävät: https://fullstackopen.com/
 
