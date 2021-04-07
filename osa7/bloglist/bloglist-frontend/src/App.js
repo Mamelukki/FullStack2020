@@ -11,6 +11,7 @@ import { setUser, logout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 import { newBlog, initializeBlogs } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
+import { Navbar, Nav, Container, Button } from 'react-bootstrap'
 import {
   BrowserRouter as Router,
   Switch, Route, Link
@@ -50,7 +51,7 @@ const App = () => {
 
   const blogForm = () => {
     return (
-      <Togglable buttonLabel='new blog' ref={blogFormRef}>
+      <Togglable buttonLabel='New blog' ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Togglable>
     )
@@ -60,24 +61,20 @@ const App = () => {
     dispatch(logout())
   }
 
-  const padding = {
-    padding: 5
-  }
-
-  const backgroundColor = {
-    backgroundColor: 'lightGrey',
-    padding: '8px'
-  }
-
   return (
     <Router>
-      <div>
-        <h2>Blog app</h2>
-        <div style={backgroundColor}>
-          <Link style={padding} to="/blogs">blogs</Link>
-          <Link style={padding} to="/users">users</Link>
-          {currentUser ? <em>{currentUser.name} logged in <button type="submit" onClick={handleLogout}>logout</button></em> : <Link style={padding} to="/login">login</Link>}
-        </div>
+      <div className='container'>
+        <Navbar bg="secondary" variant="dark">
+          <Navbar.Brand href='/blogs'>BLOG APP</Navbar.Brand>
+          <Navbar.Toggle />
+          <Nav.Link style={{ color: 'white' }} href='/blogs'>Blogs</Nav.Link>
+          <Nav.Link style={{ color: 'white' }} href='/users'>Users</Nav.Link>
+          <Navbar.Collapse className="justify-content-end">
+            <Navbar.Text>
+              {currentUser ? <em style={{ alignment: 'right' }}>{currentUser.name} logged in <Button variant='light' type='submit' onClick={handleLogout}>Logout</Button></em> : <Nav.Link href='/login'>Login</Nav.Link>}
+            </Navbar.Text>
+          </Navbar.Collapse>
+        </Navbar>
         <Notification notification={notification} />
         <Switch>
           <Route path="/users/:id">

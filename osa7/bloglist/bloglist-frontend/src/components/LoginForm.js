@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import {
   useHistory
 } from 'react-router-dom'
+import { Form, Button } from 'react-bootstrap'
 
 const LoginForm = () => {
   const dispatch = useDispatch()
@@ -26,26 +27,25 @@ const LoginForm = () => {
     <div>
       <h2>Login</h2>
 
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
+      <Form onSubmit={handleLogin}>
+        <Form.Group>
+          <Form.Label>Username</Form.Label>
+          <Form.Control
             id='username'
+            type='text'
             value={username}
             onChange={({ target }) => setUsername(target.value)}
           />
-        </div>
-        <div>
-          password
-          <input
+          <Form.Label>Username</Form.Label>
+          <Form.Control
             id='password'
             type='password'
             value={password}
             onChange={({ target }) => setPassword(target.value)}
           />
-        </div>
-        <button id='login-button' type="submit">login</button>
-      </form>
+          <Button id='login-button' type="submit">Login</Button>
+        </Form.Group>
+      </Form>
     </div>
   )
 }

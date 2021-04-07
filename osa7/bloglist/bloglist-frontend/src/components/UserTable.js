@@ -1,4 +1,5 @@
 import React from 'react'
+import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 const UserTable = ({ users }) => {
@@ -6,11 +7,11 @@ const UserTable = ({ users }) => {
   return (
     <div>
       <h2>Users</h2>
-      <table style={{ textAlign: 'left' }}>
+      <Table striped>
         <tbody>
           <tr>
             <th></th>
-            <th>blogs created</th>
+            <th>Blogs created</th>
           </tr>
           {users.map(user =>
             <tr key={user.id}>
@@ -19,7 +20,7 @@ const UserTable = ({ users }) => {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
 }

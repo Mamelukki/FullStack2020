@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { addLike, deleteBlog, addComment } from '../reducers/blogReducer'
 import { useDispatch } from 'react-redux'
 import { useParams } from "react-router-dom"
+import { Button, Form } from 'react-bootstrap'
 import {
-  useHistory
+  useHistory, Link
 } from 'react-router-dom'
 
 const Blog = ({ blogs }) => {
@@ -43,21 +44,22 @@ const Blog = ({ blogs }) => {
   return (
     <div>
       <h2>{blog.title} {blog.author}</h2>
-      <a href={blog.url}>{blog.url}</a>
-      <div>likes {blog.likes} <button id='like-button' onClick={() => dispatch(addLike(blog))}>like</button></div>
-      <div>added by {blog.user.name}</div>
-      <div><button id='remove-button' onClick={() => removeBlog(blog.id)}>remove</button></div>
+      <Link to={blog.url}>{blog.url}</Link>
+      <div>Likes {blog.likes} <Button id='like-button' onClick={() => dispatch(addLike(blog))}>Like</Button></div>
+      <div>Added by {blog.user.name}</div>
+      <div><Button variant='danger' id='remove-button' onClick={() => removeBlog(blog.id)}>Remove</Button></div>
+      <br></br>
       <h2>Comments</h2>
-      <form onSubmit={addNewComment}>
-      <div>
-        <input
+      <Form onSubmit={addNewComment}>
+        <Form.Control
+          type='text'
           id='comment'
           value={comment}
           onChange={handleCommentChange}
         />
-        <button id='comment-button' type="submit">add comment</button>
-      </div>
-      </form>
+        <Button id='comment-button' type="submit">Add comment</Button>
+      </Form>
+      <br></br>
       <ul>
         {blog.comments.map(comment => 
           <li key={comment.id}>{comment.comment}</li>  
