@@ -11,10 +11,10 @@ import { setUser, logout } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
 import { newBlog, initializeBlogs } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navbar, Nav, Container, Button } from 'react-bootstrap'
+import { Navbar, Nav, Button } from 'react-bootstrap'
 import {
   BrowserRouter as Router,
-  Switch, Route, Link
+  Switch, Route
 } from 'react-router-dom'
 
 const App = () => {

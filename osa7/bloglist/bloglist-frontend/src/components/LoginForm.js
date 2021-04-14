@@ -31,14 +31,12 @@ const LoginForm = () => {
         <Form.Group>
           <Form.Label>Username</Form.Label>
           <Form.Control
-            id='username'
             type='text'
             value={username}
             onChange={({ target }) => setUsername(target.value)}
           />
           <Form.Label>Username</Form.Label>
           <Form.Control
-            id='password'
             type='password'
             value={password}
             onChange={({ target }) => setPassword(target.value)}
