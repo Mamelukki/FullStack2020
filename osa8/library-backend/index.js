@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const Book = require('./models/book')
 const Author = require('./models/author')
 const { v1: uuid } = require('uuid')
+const author = require('./models/author')
 
 const MONGODB_URI = process.env.MONGODB_URI
 
@@ -56,37 +57,38 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
+    bookCount: () => Book.collection.countDocuments(),
+    authorCount: () => Author.collection.countDocuments(),
+    allBooks: async (root, args) => {
       if (!args.author && !args.genre) {
-        return books
+        return await Book.find({})
       }
       if (args.author && args.genre) {
-        return books.filter(book => book.author === args.author && book.genres.includes(args.genre))
+        return await Book.find({ author: { "$in": [args.author] }, genres: { "$in": [args.genre] } })
       }
       if (args.author) {
-        return books.filter(book => book.author === args.author)
+        return await Book.find({ author: { "$in": [args.author] } })
       }
       if (args.genre) {
-        return books.filter(book => book.genres.includes(args.genre))
+        return await Book.find({ genres: { "$in": [args.genre] } })
       }
     },
-    allAuthors: () => {
-      return authors.map(author => {
-        const bookCount = books.filter(book => book.author === author.name).length
-        return { ...author, bookCount }
+    allAuthors: async () => {
+      let authors = await Author.find({})
+      return authors.map(async author => {
+        const bookCount = (await Book.find({ author: { "$in": [author._id] } })).length
+        return { name: author.name, born: author.born, bookCount: bookCount }
       })
     }
   },
   Mutation: {
     addBook: async (root, args) => {
-      const author = await Author.findOne({ name: args.name })
+      let author = await Author.findOne({ name: args.author })
 
       if (!author) {
-        const newAuthor = new Author({ name: args.author })
+        author = new Author({ name: args.author })
         try {
-          await newAuthor.save()
+          await author.save()
         } catch (error) {
           throw new UserInputError(error.message, {
             invalidArgs: args,
@@ -94,7 +96,7 @@ const resolvers = {
         }
       }
 
-      const book = new Book({ ...args, author: author, id: uuid() })
+      const book = new Book({ ...args, author: author._id })
 
       try {
         await book.save()
