@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { useQuery } from '@apollo/client'
+import { useQuery, useApolloClient } from '@apollo/client'
 
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 
 import { ALL_AUTHORS, ALL_BOOKS } from './queries'
+import LoginForm from './components/LoginForm'
 
 const Notify = ({errorMessage}) => {  
   if ( !errorMessage ) {    
@@ -23,6 +24,14 @@ const App = () => {
   const booksResult = useQuery(ALL_BOOKS)
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
+  const [token, setToken] = useState(null)
+  const client = useApolloClient()
+
+  const logout = () => {    
+    setToken(null)    
+    localStorage.clear()    
+    client.resetStore()  
+  }
 
   if (authorsResult.loading || booksResult.loading)  {
     return <div>loading...</div>
@@ -35,12 +44,42 @@ const App = () => {
     }, 10000)  
   }
 
+  if (!token) {
+    return (
+      <div>
+        <button onClick={() => setPage('authors')}>authors</button>
+        <button onClick={() => setPage('books')}>books</button>
+        <button onClick={() => setPage('login')}>login</button>
+
+        <Notify errorMessage={errorMessage} />
+
+        <LoginForm
+          show={page === 'login'}
+          setToken={setToken}
+          setError={notify}
+        />
+
+        <Authors
+          show={page === 'authors'}
+          authors={authorsResult.data.allAuthors}
+          setError={notify}
+        />
+
+        <Books
+          show={page === 'books'}
+          books={booksResult.data.allBooks}
+        />
+      </div>
+    )
+  }
+
   return (
     <div>
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         <button onClick={() => setPage('add')}>add book</button>
+        <button onClick={() => logout()}>logout</button>
       </div>
       
       <Notify errorMessage={errorMessage} />
@@ -49,6 +88,7 @@ const App = () => {
         show={page === 'authors'}
         authors={authorsResult.data.allAuthors}
         setError={notify}
+        token={token}
       />
 
       <Books

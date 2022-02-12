@@ -136,7 +136,7 @@ const resolvers = {
         })
       }
 
-      return book
+      return book.populate('author', { name: 1 })
     }, 
     editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
