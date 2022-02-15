@@ -8,6 +8,10 @@ const Recommendations = ({ show, user, books }) => {
 
   const booksToShow = books.filter(book => book.genres.includes(user.favoriteGenre))
 
+  if (!show) {
+    return null
+  }
+
   return (
     <div>
       <h2>recommendations</h2>
