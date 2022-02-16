@@ -143,7 +143,7 @@ const resolvers = {
         })
       }
 
-      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+      pubsub.publish('BOOK_ADDED', { bookAdded: book.populate('author', { name: 1 }) })
 
       return book.populate('author', { name: 1 })
     }, 
